@@ -6,6 +6,11 @@ pipeline {
         string(name: 'APP_VERSION', defaultValue: 'v1.0', description: 'Application version tag')
     }
 
+    environment {
+        PROJECT_DIR = 'jenkins-ansible-demo-miniproject' // 👈 This is added
+    }
+
+
     stages {
         stage('Show Inputs') {
             steps {
@@ -18,8 +23,13 @@ pipeline {
             parallel {
                 stage('Lint') {
                     steps {
-                        echo 'Running Lint Check...'
-                        sh 'npm run lint'
+                        dir("${env.PROJECT_DIR}") {
+                            echo 'Running Lint Check...'
+                            sh 'npm run lint'
+
+                        }
+                        
+                        
                     }
                 }
                 stage('Test') {
