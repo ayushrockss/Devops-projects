@@ -1,0 +1,13 @@
+- name: Deploy App to EC2
+  hosts: all
+  become: yes
+  tasks:
+    - name: Stop old container if running
+      shell: docker stop myapp || true
+
+    - name: Remove old container if exists
+      shell: docker rm myapp || true
+
+    - name: Run latest app container
+      shell: |
+        docker run -d --name myapp -p 80:3000 my-app:{{ app_version }}
