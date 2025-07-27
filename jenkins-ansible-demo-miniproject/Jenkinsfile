@@ -10,7 +10,6 @@ pipeline {
         PROJECT_DIR = 'jenkins-ansible-demo-miniproject' // 👈 This is added
     }
 
-
     stages {
         stage('Show Inputs') {
             steps {
@@ -28,20 +27,22 @@ pipeline {
                             sh 'npm run lint'
 
                         }
-                        
-                        
                     }
                 }
                 stage('Test') {
                     steps {
-                        echo 'Running Tests...'
-                        sh 'npm test'
+                        dir("${env.PROJECT_DIR}") {
+                            echo 'Running Tests...'
+                            sh 'npm test'
+                        }
                     }
                 }
                 stage('Build Docker Image') {
                     steps {
-                        echo "Building Docker image: my-app:${params.APP_VERSION}"
-                        sh "docker build -t my-app:${params.APP_VERSION} ."
+                        dir("${env.PROJECT_DIR}") {
+                            echo "Building Docker image: my-app:${params.APP_VERSION}"
+                            sh "docker build -t my-app:${params.APP_VERSION} ."
+                        }
                     }
                 }
             }
@@ -54,11 +55,13 @@ pipeline {
             steps {
                 echo "Running Ansible Playbook for production deployment..."
                 sshagent(credentials: ['ubuntu']) {
-                    sh '''
+                    dir("${env.PROJECT_DIR}") {
+                        sh '''
                         cd ansible
                         ansible-playbook -i inventory deploy.yml \
                         --extra-vars "app_version=${APP_VERSION} env=${ENVIRONMENT}"
-                    '''
+                        '''
+                    }
                 }
             }
         }
