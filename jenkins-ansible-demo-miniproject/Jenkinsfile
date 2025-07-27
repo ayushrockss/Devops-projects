@@ -54,7 +54,7 @@ pipeline {
             }
             steps {
                 echo "Running Ansible Playbook for production deployment..."
-                sshagent(credentials: ['ubuntu']) {
+                sshagent(credentials: ['ec2-ssh-key']) {
                     dir("${env.PROJECT_DIR}") {
                         sh '''
                         cd ansible
